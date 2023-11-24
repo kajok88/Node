@@ -2,7 +2,6 @@ POST http://localhost:3002/persons/
 content-type: application/json
 
 {
-    "name": "Test Person",
-    "number" : "1234567890",
-    "important": "true"
+    "name": "Test Person2",
+    "number" : "12345678900"
 }

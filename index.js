@@ -31,15 +31,15 @@ const generateId = () => {
 app.post('/persons', (request, response) => {
   const body = request.body
 
-  if (!body.content) {
+  if (!body.number) {
     return response.status(400).json({ 
       error: 'content missing' 
     })
   }
 
   const person = {
-    content: body.content,
-    important: body.important || false,
+    name: body.name || null,
+    number: body.number || null,
     id: generateId(),
   }
 
