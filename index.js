@@ -7,6 +7,14 @@ app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
+app.get('/info', (req, res) => {
+  const maxId = persons.length > 0
+    ? Math.max(...persons.map(n => n.id))
+    : 0
+  res.send(`Phonebook has info for ${maxId} people <br /> ${Date()}`)
+  
+})
+
 app.get('/persons', (req, res) => {
   res.json(persons)
 })
@@ -30,12 +38,30 @@ const generateId = () => {
 
 app.post('/persons', (request, response) => {
   const body = request.body
-
-  if (!body.number) {
-    return response.status(400).json({ 
-      error: 'content missing' 
-    })
+  console.log(...persons)
+  for (let i = 0; i < 3; i++) {
+    const result = persons.map(name => persons[i].name)
+    console.log(result)
   }
+  
+
+  // if (!body.number) {
+  //   return response.status(400).json({ 
+  //     error: 'content missing' 
+  //   })
+  // }
+  if (!body.name) {
+    return response.status(400).json({ error: 'name missing' })
+  }
+  if (!body.number) {
+    return response.status(400).json({ error: 'number missing' })
+  }
+
+  const names = (...persons) => {
+  // if ((...persons) => includes(body.name)) {
+  if (body.name in names) {
+    return response.status(400).json({ error: 'name must be unique' })
+  }}
 
   const person = {
     name: body.name || null,
