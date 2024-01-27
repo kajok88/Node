@@ -47,6 +47,26 @@ app.get('/persons/:id', (request, response) => {
   }
 });
 
+app.put('/persons/:id', (request, response) => {
+  const id = Number(request.params.id);
+  const personIndex = persons.findIndex(person => person.id === id);
+
+  if (personIndex) {
+    const person = persons[personIndex];
+    const body = request.body;
+
+    const updatedPerson = {
+      ...person,
+      number: body.number,
+    };
+
+    persons = persons.map((p, index) => (index === personIndex ? updatedPerson : p));
+    response.json(updatedPerson);
+  } else {
+    response.status(404).end();
+  }
+});
+
 
 app.delete('/persons/:id', (request, response) => {
   const id = Number(request.params.id);
@@ -66,23 +86,24 @@ app.post('/persons', (request, response) => {
   if (existingPerson) {
     return response.status(400).json({ error: 'Name must be unique' });
   }
-  const person = {
-    name: body.name,
-    number: body.number,
-    id: generateId(),
-  };
   const generateId = () => {
     const maxId = persons.length > 0
       ? Math.max(...persons.map(n => n.id))
       : 0;
     return maxId + 1;
   }
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateId(),
+  };
+  
   persons = persons.concat(person);
   response.json(person);
 });
 
 
-const PORT = 3003;
+const PORT = 3004;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
