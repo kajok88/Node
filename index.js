@@ -16,36 +16,78 @@ morgan.token('postData', (req) => {
   return '';
 });
 
+const generateId = () => {
+  const maxId = pins.length > 0
+    ? Math.max(...pins.map(n => n.id))
+    : 0
+  return maxId + 1
+}
+
+
 app.get('/pins', (req, res) => {
   res.json(pins);
 });
+app.get('/pinCount', (req, res) => {
+  const maxId = pins.length > 0
+    ? Math.max(...pins.map(n => n.id))
+    : 0;
+  res.send(`${maxId} Pins saved!`);
+});
+app.get('/pins/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const pin = pins.find(pin => pin.id === id);
+  if (pin) {
+    res.json(pin);
+  } else {
+    res.status(404).end();
+  }
+});
 
-const generateId = () => {
-    const maxId = pins.length > 0
-      ? Math.max(...pins.map(n => n.id))
-      : 0
-    return maxId + 1
-}
 
-app.post('/pins', (request, response) => {
-const body = request.body
+app.put('/pins/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const pinIndex = pins.findIndex(pin => pin.id === id);
+
+  if (pinIndex) {
+    const pin = pins[pinIndex];
+    const body = req.body;
+    const updatedPin = {
+      ...pin,
+      title: body.title,
+    };
+
+    pins = pins.map((p, index) => (index === pinIndex ? updatedPin : p));
+    res.json(updatedPin);
+  } else {
+    res.status(404).end();
+  }
+});
+
+
+app.post('/pins', (req, res) => {
+const body = req.body
 
   if (!body.title || !body.coordinates) {
-      return response.status(400).json({ 
+      return res.status(400).json({ 
       error: 'title or coordinates missing' 
       })
   }
-
   const pin = {
     id: generateId(),
     pinType: body.pinType,
     title: body.title,
     coordinates: body.coordinates
   }
-
   pins = pins.concat(pin)
-  response.json(pin)
+  res.json(pin)
 })
+
+
+app.delete('/pins/:id', (req, res) => {
+  const id = Number(req.params.id);
+  pins = pins.filter(pin => pin.id !== id);
+  res.status(204).end();
+});
 
 
 const PORT = 3004;
