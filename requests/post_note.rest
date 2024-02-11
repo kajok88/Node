@@ -1,7 +1,12 @@
-POST http://localhost:3004/persons/
+POST http://localhost:3004/pins/
 content-type: application/json
 
 {
-    "name": "Arto Hellass",
-    "number" : ""
+    "pinType":"red",
+    "title":"test1",
+    "coordinates":
+        {
+            "lat":59.81476586847171,
+            "lng":55.72265625
+        }
 }

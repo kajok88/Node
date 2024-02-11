@@ -72,6 +72,12 @@ const body = req.body
       error: 'title or coordinates missing' 
       })
   }
+
+  const existingTitle = pins.find(pin => pin.title === body.title);
+  if (existingTitle) {
+    return res.status(400).json({ error: 'Title must be unique' });
+  }
+
   const pin = {
     id: generateId(),
     pinType: body.pinType,

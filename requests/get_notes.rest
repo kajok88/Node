@@ -1,1 +1,1 @@
-GET http://localhost:3004/persons
+GET http://localhost:3004/pins
