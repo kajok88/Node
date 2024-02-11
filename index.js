@@ -22,7 +22,10 @@ const generateId = () => {
     : 0
   return maxId + 1
 }
-
+// Get only YYYY-MM-DD
+const getCurrentDate = () => {
+  return new Date().toISOString().slice(0, 10); 
+};
 
 app.get('/pins', (req, res) => {
   res.json(pins);
@@ -82,7 +85,8 @@ const body = req.body
     id: generateId(),
     pinType: body.pinType,
     title: body.title,
-    coordinates: body.coordinates
+    coordinates: body.coordinates,
+    date: getCurrentDate()
   }
   pins = pins.concat(pin)
   res.json(pin)
