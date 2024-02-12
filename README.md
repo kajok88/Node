@@ -11,4 +11,4 @@ Käyttöönotto:
 
 >> npm install
 >
->> node index.js {password}
+>> node index.js {MongoDB_password}
