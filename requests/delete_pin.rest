@@ -1,0 +1,1 @@
+DELETE http://localhost:3004/api/pins/65ca99f710e3da2c71850837

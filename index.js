@@ -2,8 +2,10 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const Pin = require('./models/pin')
 
-let pins = []; 
+const PORT = 3004;
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :postData'));
 app.use(express.json());
@@ -16,91 +18,87 @@ morgan.token('postData', (req) => {
   return '';
 });
 
-const generateId = () => {
-  const maxId = pins.length > 0
-    ? Math.max(...pins.map(n => n.id))
-    : 0
-  return maxId + 1
-}
-// Get only YYYY-MM-DD
+
+app.get('/api/pins', async (req, res) => {
+  try {
+    const pins = await Pin.find();
+    res.json(pins);
+  } catch (error) {
+    console.error('Error fetching pins:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+app.get('/api/pinCount', async (req, res) => {
+  try {
+    const count = await Pin.countDocuments();
+    res.send(`${count} Pins saved!`);
+  } catch (error) {
+    console.error('Error counting pins:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+app.get('/api/pins/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const pin = await Pin.findById(id);
+    if (pin) {
+      res.json(pin);
+    } else {
+      res.status(404).end();
+    }
+  } catch (error) {
+    console.error('Error fetching pin:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.put('/api/pins/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const updatedPin = await Pin.findByIdAndUpdate(id, req.body, { new: true });
+    if (updatedPin) {
+      res.json(updatedPin);
+    } else {
+      res.status(404).end();
+    }
+  } catch (error) {
+    console.error('Error updating pin:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.post('/api/pins', async (req, res) => {
+  try {
+    const pinData = req.body;
+    // Add timestamp using getCurrentDate function
+    pinData.date = getCurrentDate();
+    const pin = new Pin(pinData);
+    const savedPin = await pin.save();
+    res.json(savedPin);
+  } catch (error) {
+    console.error('Error saving pin:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+// To get the current date, only in YYYY-MM-DD
 const getCurrentDate = () => {
   return new Date().toISOString().slice(0, 10); 
 };
 
-app.get('/pins', (req, res) => {
-  res.json(pins);
-});
-app.get('/pinCount', (req, res) => {
-  const maxId = pins.length > 0
-    ? Math.max(...pins.map(n => n.id))
-    : 0;
-  res.send(`${maxId} Pins saved!`);
-});
-app.get('/pins/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const pin = pins.find(pin => pin.id === id);
-  if (pin) {
-    res.json(pin);
-  } else {
-    res.status(404).end();
+
+app.delete('/api/pins/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    await Pin.findByIdAndDelete(id);
+    res.status(204).end();
+  } catch (error) {
+    console.error('Error deleting pin:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-
-app.put('/pins/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const pinIndex = pins.findIndex(pin => pin.id === id);
-
-  if (pinIndex) {
-    const pin = pins[pinIndex];
-    const body = req.body;
-    const updatedPin = {
-      ...pin,
-      title: body.title,
-    };
-
-    pins = pins.map((p, index) => (index === pinIndex ? updatedPin : p));
-    res.json(updatedPin);
-  } else {
-    res.status(404).end();
-  }
-});
-
-
-app.post('/pins', (req, res) => {
-const body = req.body
-
-  if (!body.title || !body.coordinates) {
-      return res.status(400).json({ 
-      error: 'title or coordinates missing' 
-      })
-  }
-
-  const existingTitle = pins.find(pin => pin.title === body.title);
-  if (existingTitle) {
-    return res.status(400).json({ error: 'Title must be unique' });
-  }
-
-  const pin = {
-    id: generateId(),
-    pinType: body.pinType,
-    title: body.title,
-    coordinates: body.coordinates,
-    date: getCurrentDate()
-  }
-  pins = pins.concat(pin)
-  res.json(pin)
-})
-
-
-app.delete('/pins/:id', (req, res) => {
-  const id = Number(req.params.id);
-  pins = pins.filter(pin => pin.id !== id);
-  res.status(204).end();
-});
-
-
-const PORT = 3004;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

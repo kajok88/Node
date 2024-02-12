@@ -1,0 +1,12 @@
+POST http://localhost:3004/api/pins/
+content-type: application/json
+
+{
+    "pinType":"red",
+    "title":"test4",
+    "coordinates":
+        {
+            "lat":59.81476586847171,
+            "lng":55.72265625
+        }
+}
