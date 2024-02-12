@@ -27,7 +27,7 @@ app.get('/api/pins', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-app.get('/api/pinCount', async (req, res) => {
+app.get('/api/pins/pinCount', async (req, res) => {
   try {
     const count = await Pin.countDocuments();
     res.send(`${count} Pins saved!`);
