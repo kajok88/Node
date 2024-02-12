@@ -1,0 +1,12 @@
+PUT http://localhost:3004/api/pins/65ca94a607f58262d977d88b
+content-type: application/json
+
+{
+    "pinType":"red",
+    "title":"paivitettu_test2",
+    "coordinates":
+        {
+            "lat":59.81476586847171,
+            "lng":55.72265625
+        }
+}
