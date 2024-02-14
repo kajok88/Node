@@ -12,7 +12,11 @@ const url =
 mongoose.set('strictQuery', false);
 mongoose.connect(url)
   .then(() => console.log('Connected to MongoDB Atlas'))
-  .catch(err => console.error('Error connecting to MongoDB Atlas:', err));
+  .catch(err => {
+    console.error('Error connecting to MongoDB:', err, '\nCheck your password \nExiting...');
+    process.exit(1);    // Close the  application if an error occurs during connection
+  });
+
 
 const pinSchema = new mongoose.Schema({
   pinType: String,
